@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, ActivityIndicator, Platform, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator, Platform } from "react-native";
 import useLocation from "../hooks/useLocation";
 import { UsersContext } from "../UsersContext";
 
@@ -30,31 +30,6 @@ export default function MapsFixed() {
       <View style={styles.center}>
         <Text style={styles.errorText}>{errorMsg}</Text>
       </View>
-    );
-  }
-
-  
-  if (Platform.OS === "web") {
-    return (
-      <ScrollView contentContainerStyle={styles.center}>
-        <Text style={{ fontSize: 16, textAlign: "center", marginBottom: 8 }}>
-          O mapa não é suportado nesta plataforma (web).
-        </Text>
-        <Text style={{ textAlign: "center", marginBottom: 12 }}>Usuários cadastrados (lat, lng):</Text>
-        {users && users.length > 0 ? (
-          users.map((u) => (
-            <View key={u.id} style={{ padding: 6 }}>
-              <Text style={{ fontWeight: "bold" }}>{u.name}</Text>
-              <Text>{u.address}</Text>
-              <Text>
-                ({u.latitude.toFixed(6)}, {u.longitude.toFixed(6)})
-              </Text>
-            </View>
-          ))
-        ) : (
-          <Text>Nenhum usuário cadastrado.</Text>
-        )}
-      </ScrollView>
     );
   }
 
@@ -91,7 +66,6 @@ export default function MapsFixed() {
     }
 
     if (allPoints.length === 0) {
-      // fallback se não houver pontos
       return {
         latitude: -23.55052,
         longitude: -46.633308,
@@ -107,7 +81,7 @@ export default function MapsFixed() {
     const minLng = Math.min(...lngs);
     const maxLng = Math.max(...lngs);
 
-    const latDelta = (maxLat - minLat) * 1.5 || 0.01; // margem 50%
+    const latDelta = (maxLat - minLat) * 1.5 || 0.01;
     const lngDelta = (maxLng - minLng) * 1.5 || 0.01;
 
     return {
