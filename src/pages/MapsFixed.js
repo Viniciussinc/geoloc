@@ -10,7 +10,7 @@ export default function MapsFixed() {
 
   useEffect(() => {
     let mounted = true;
-    // Dynamically import react-native-maps only on native platforms
+    
     if (Platform.OS !== "web") {
       import("react-native-maps")
         .then((mod) => {
@@ -33,7 +33,7 @@ export default function MapsFixed() {
     );
   }
 
-  // Web fallback: don't attempt to import or render react-native-maps on web
+  
   if (Platform.OS === "web") {
     return (
       <ScrollView contentContainerStyle={styles.center}>
@@ -68,17 +68,60 @@ export default function MapsFixed() {
     );
   }
 
+  // Check if current location is available
+  if (!coords) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#3498db" />
+        <Text style={styles.loadingText}>Carregando localização...</Text>
+      </View>
+    );
+  }
+
   const { MapView, Marker } = MapLib;
+
+  // Calculate region to show all markers (current location + registered users)
+  const calculateRegion = () => {
+    const allPoints = [];
+    if (coords) {
+      allPoints.push({ latitude: coords.latitude, longitude: coords.longitude });
+    }
+    if (users && users.length > 0) {
+      users.forEach((u) => allPoints.push({ latitude: u.latitude, longitude: u.longitude }));
+    }
+
+    if (allPoints.length === 0) {
+      // fallback se não houver pontos
+      return {
+        latitude: -23.55052,
+        longitude: -46.633308,
+        latitudeDelta: 0.1,
+        longitudeDelta: 0.1,
+      };
+    }
+
+    const lats = allPoints.map((p) => p.latitude);
+    const lngs = allPoints.map((p) => p.longitude);
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
+    const minLng = Math.min(...lngs);
+    const maxLng = Math.max(...lngs);
+
+    const latDelta = (maxLat - minLat) * 1.5 || 0.01; // margem 50%
+    const lngDelta = (maxLng - minLng) * 1.5 || 0.01;
+
+    return {
+      latitude: (minLat + maxLat) / 2,
+      longitude: (minLng + maxLng) / 2,
+      latitudeDelta: Math.max(latDelta, 0.01),
+      longitudeDelta: Math.max(lngDelta, 0.01),
+    };
+  };
 
   return (
     <MapView
       style={styles.map}
-      initialRegion={{
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      }}
+      initialRegion={calculateRegion()}
       showsUserLocation={true}
     >
       <Marker
@@ -94,6 +137,7 @@ export default function MapsFixed() {
             coordinate={{ latitude: u.latitude, longitude: u.longitude }}
             title={u.name}
             description={u.address}
+            pinColor="blue"
           />
         ))}
     </MapView>
