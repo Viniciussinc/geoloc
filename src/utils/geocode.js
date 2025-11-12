@@ -1,10 +1,8 @@
 import * as Location from "expo-location";
 
-// Geocode an address string to { latitude, longitude } using expo-location.
-// If expo's geocodeAsync is unavailable or fails (some SDKs removed geocoding),
-// we fall back to OpenStreetMap Nominatim (no API key required).
+
 export async function geocodeAddress(address) {
-  // try expo-location first
+  
   try {
     if (Location && typeof Location.geocodeAsync === "function") {
       const locations = await Location.geocodeAsync(address);

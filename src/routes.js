@@ -2,7 +2,7 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Main from "./pages/Main";
-import Maps from "./pages/MapsFixed";
+import Maps from "./pages/Maps";
 import { UsersProvider } from "./UsersContext";
 
 const Stack = createStackNavigator();
